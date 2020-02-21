@@ -21,7 +21,9 @@ jobs:
       - run:
           name: Lint code
           command: npm run lint
-
+      - run:
+          name: Cypress Verfiy
+          command: $(npm bin)/cypress verify
       - run:
           name: Run tests
           command: npm test
