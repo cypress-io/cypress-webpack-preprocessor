@@ -25,14 +25,14 @@ The error was:
 Error: Webpack Compilation Error
 ./cypress/tests/e2e/compile-error.js
 Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /[cwd]/cypress/tests/e2e/compile-error.js: Unexpected token, expected "," (12:27)
+SyntaxError: /[cwd]/cypress/tests/e2e/compile-error.js: Unexpected token, expected "," (14:27)
 
-  10 | 
-  11 | describe('foo', ()=>{
-> 12 |   it('has syntax error' () => {}})
+  12 | 
+  13 | describe('foo', ()=>{
+> 14 |   it('has syntax error' () => {}})
      |                            ^
-  13 | })
-  14 | 
+  15 | })
+  16 | 
 
  @ multi ./cypress/tests/e2e/compile-error.js main[0]
 
