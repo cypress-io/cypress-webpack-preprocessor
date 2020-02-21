@@ -123,11 +123,14 @@ const preprocessor = (options = {}) => {
 
       if (stats.hasErrors()) {
         err = new Error('Webpack Compilation Error')
-        err.message += `\n${jsonStats.errors
+
+        const errorsToAppend = jsonStats.errors
         // remove stack trace lines since they're useless for debugging
         .map((err) => err.replace(/\n\s*at.*/g, '').replace(/From previous event:\n?/g, ''))
         // multiple errors separated by newline
-        .join('\n\n')}`
+        .join('\n\n')
+
+        err.message += `\n${errorsToAppend}`
 
         return rejectWithErr(err)
       }
