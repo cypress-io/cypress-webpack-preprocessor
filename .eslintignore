@@ -1,4 +1,7 @@
 test/_test-output
 cypress/tests/e2e/compile-error.js
 test/fixtures
+examples/react-app/src
+examples/react-app/node_modules
+examples/react-app/package.json
 *.ts

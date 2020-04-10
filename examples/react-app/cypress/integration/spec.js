@@ -2,7 +2,6 @@
 // this spec file will be bundled using the same Webpack options
 // as the React App itself. See ../plugins/index.js
 
-/* global cy */
 describe('Todo app', () => {
   it('works', () => {
     cy.visit('/')

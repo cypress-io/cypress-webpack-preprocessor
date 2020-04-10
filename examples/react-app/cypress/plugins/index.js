@@ -26,8 +26,9 @@ module.exports = (on) => {
   // that we found to be breaking the bundling
   // https://github.com/bahmutov/find-webpack
   const cleanOptions = {
-    reactScripts: true
+    reactScripts: true,
   }
+
   findWebpack.cleanForCypress(cleanOptions, webpackOptions)
 
   const options = {
