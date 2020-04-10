@@ -34,12 +34,24 @@ workflows:
                 name: Run tests w/ webpack@latest 🧪
                 command: npm test
 
+      - cypress/run:
+          name: Test React App
+          requires:
+            - Install
+          executor: cypress/base-12-14-0
+          install-command: echo 'Nothing to install in this job'
+          start: npm start
+          wait-on: 'http://localhost:3000'
+          no-workspace: true
+          working_directory: examples/react-app
+
       # wait for all jobs to finish and possible run NPM release
       - cypress/run:
           name: NPM release
           requires:
             - Install
             - Tests
+            - Test React App
           # nothing to install - cypress/install job does it
           # and nothing to pass to the next job
           install-command: echo 'Nothing to install in this job'
