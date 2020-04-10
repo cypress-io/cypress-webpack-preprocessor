@@ -45,7 +45,6 @@ workflows:
           # and the wait just goes on and on ... so let's set short timeout
           timeout: '1m'
           start: npm start
-          wait-on: 'http://localhost:3000'
           no-workspace: true
           working_directory: examples/react-app
 
