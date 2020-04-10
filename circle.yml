@@ -21,6 +21,7 @@ workflows:
           requires:
             - Install
           executor: cypress/base-12-14-0
+          install-command: echo 'Nothing else to install in this job'
           command: npm test
           no-workspace: true
           post-steps:
@@ -39,7 +40,7 @@ workflows:
           requires:
             - Install
           executor: cypress/base-12-14-0
-          install-command: echo 'Nothing to install in this job'
+          install-command: echo 'Nothing else to install in this job'
           start: npm start
           wait-on: 'http://localhost:3000'
           no-workspace: true
@@ -54,7 +55,7 @@ workflows:
             - Test React App
           # nothing to install - cypress/install job does it
           # and nothing to pass to the next job
-          install-command: echo 'Nothing to install in this job'
+          install-command: echo 'Nothing else to install in this job'
           no-workspace: true
           # instead of "cypress run" do NPM release 😁
           command: npm run semantic-release
