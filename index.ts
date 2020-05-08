@@ -9,7 +9,10 @@ const debugStats = require('debug')('cypress:webpack:stats')
 const createDeferred = require('./deferred')
 const stubbableRequire = require('./stubbable-require')
 
-let bundles:{[key: string]: Promise<any>} = {}
+type FilePath = string
+
+// bundle promises from input spec filename to output bundled file paths
+let bundles:{[key: string]: Promise<FilePath>} = {}
 
 // we don't automatically load the rules, so that the babel dependencies are
 // not required if a user passes in their own configuration
@@ -36,13 +39,14 @@ const getDefaultWebpackOptions = (): webpack.Configuration => {
   }
 }
 
+/**
+ * Configuration object for this Webpack preprocessor
+ */
 interface PreprocessorOptions {
   webpackOptions?: webpack.Configuration
   watchOptions?: Object
   additionalEntries?: string[]
 }
-
-type FilePath = string
 
 interface FileEvent extends events.EventEmitter {
   filePath: FilePath
@@ -50,6 +54,10 @@ interface FileEvent extends events.EventEmitter {
   shouldWatch: boolean
 }
 
+/**
+ * Cypress asks file preprocessor to bundle the given file
+ * and return the full path to produced bundle.
+ */
 type FilePreprocessor = (file: FileEvent) => Promise<FilePath>
 
 type WebpackPreprocessorFn = (options: PreprocessorOptions) => FilePreprocessor
@@ -58,13 +66,16 @@ interface WebpackPreprocessor extends WebpackPreprocessorFn {
   defaultOptions: Omit<PreprocessorOptions, 'additionalEntries'>
 }
 
-// export a function that returns another function, making it easy for users
-// to configure like so:
-//
-// on('file:preprocessor', webpack(options))
-//
+/**
+ * Webpack preprocessor configuration function. Takes configuration object
+ * and returns file preprocessor.
+ * @example
+  ```
+  on('file:preprocessor', webpackPreprocessor(options))
+  ```
+ */
 // @ts-ignore
-const preprocessor: WebpackPreprocessor = (options:PreprocessorOptions = {}) => {
+const preprocessor: WebpackPreprocessor = (options:PreprocessorOptions = {}):FilePreprocessor => {
   debug('user options:', options)
 
   // we return function that accepts the arguments provided by
@@ -235,6 +246,7 @@ const preprocessor: WebpackPreprocessor = (options:PreprocessorOptions = {}) => 
       delete bundles[filePath]
 
       if (file.shouldWatch) {
+        // in this case the bundler is webpack.Compiler.Watching
         (bundler as webpack.Compiler.Watching).close(cb)
       }
     })
@@ -258,7 +270,7 @@ Object.defineProperty(preprocessor, 'defaultOptions', {
   },
 })
 
-// for testing purposes
+// for testing purposes, but do not add this to the typescript interface
 // @ts-ignore
 preprocessor.__reset = () => {
   bundles = {}
