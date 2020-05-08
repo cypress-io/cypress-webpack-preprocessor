@@ -1,6 +1,6 @@
 import * as Promise from 'bluebird'
 
-const createDeferred = () => {
+export function createDeferred () {
   const deferred = {}
 
   // @ts-ignore
@@ -13,5 +13,3 @@ const createDeferred = () => {
 
   return deferred
 }
-
-export = createDeferred

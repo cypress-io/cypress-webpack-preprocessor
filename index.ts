@@ -2,17 +2,18 @@ import * as webpack from 'webpack'
 import * as Promise from 'bluebird'
 import * as events from 'events'
 
+import { createDeferred } from './deferred'
+
 const path = require('path')
 const debug = require('debug')('cypress:webpack')
 const debugStats = require('debug')('cypress:webpack:stats')
 
-const createDeferred = require('./deferred')
 const stubbableRequire = require('./stubbable-require')
 
 type FilePath = string
 
 // bundle promises from input spec filename to output bundled file paths
-let bundles:{[key: string]: Promise<FilePath>} = {}
+let bundles: {[key: string]: Promise<FilePath>} = {}
 
 // we don't automatically load the rules, so that the babel dependencies are
 // not required if a user passes in their own configuration
@@ -75,7 +76,7 @@ interface WebpackPreprocessor extends WebpackPreprocessorFn {
   ```
  */
 // @ts-ignore
-const preprocessor: WebpackPreprocessor = (options:PreprocessorOptions = {}):FilePreprocessor => {
+const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): FilePreprocessor => {
   debug('user options:', options)
 
   // we return function that accepts the arguments provided by
@@ -104,7 +105,7 @@ const preprocessor: WebpackPreprocessor = (options:PreprocessorOptions = {}):Fil
     }
 
     // user can override the default options
-    let webpackOptions:webpack.Configuration = options.webpackOptions || getDefaultWebpackOptions()
+    let webpackOptions: webpack.Configuration = options.webpackOptions || getDefaultWebpackOptions()
     const watchOptions = options.watchOptions || {}
 
     debug('webpackOptions: %o', webpackOptions)
