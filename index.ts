@@ -42,10 +42,20 @@ interface PreprocessorOptions {
   additionalEntries?: string[]
 }
 
+type FilePath = string
+
 interface FileEvent extends events.EventEmitter {
-  filePath: string
+  filePath: FilePath
   outputPath: string
   shouldWatch: boolean
+}
+
+type FilePreprocessor = (file: FileEvent) => Promise<FilePath>
+
+type WebpackPreprocessorFn = (options: PreprocessorOptions) => FilePreprocessor
+
+interface WebpackPreprocessor extends WebpackPreprocessorFn {
+  defaultOptions: Omit<PreprocessorOptions, 'additionalEntries'>
 }
 
 // export a function that returns another function, making it easy for users
@@ -53,7 +63,8 @@ interface FileEvent extends events.EventEmitter {
 //
 // on('file:preprocessor', webpack(options))
 //
-function preprocessor (options:PreprocessorOptions = {}) {
+// @ts-ignore
+const preprocessor: WebpackPreprocessor = (options:PreprocessorOptions = {}) => {
   debug('user options:', options)
 
   // we return function that accepts the arguments provided by
@@ -248,6 +259,7 @@ Object.defineProperty(preprocessor, 'defaultOptions', {
 })
 
 // for testing purposes
+// @ts-ignore
 preprocessor.__reset = () => {
   bundles = {}
 }
@@ -256,6 +268,4 @@ function cleanseError (err: string) {
   return err.replace(/\n\s*at.*/g, '').replace(/From previous event:\n?/g, '')
 }
 
-// module.exports = preprocessor
-// export default preprocessor
 export = preprocessor
