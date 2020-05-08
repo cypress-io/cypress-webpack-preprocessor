@@ -1,16 +1,19 @@
+import * as webpack from 'webpack'
+import * as Promise from 'bluebird'
+import * as events from 'events'
+
 const path = require('path')
-const webpack = require('webpack')
 const debug = require('debug')('cypress:webpack')
 const debugStats = require('debug')('cypress:webpack:stats')
 
 const createDeferred = require('./deferred')
 const stubbableRequire = require('./stubbable-require')
 
-let bundles = {}
+let bundles:{[key: string]: Promise<any>} = {}
 
 // we don't automatically load the rules, so that the babel dependencies are
 // not required if a user passes in their own configuration
-const getDefaultWebpackOptions = () => {
+const getDefaultWebpackOptions = (): webpack.Configuration => {
   debug('load default options')
 
   return {
@@ -33,12 +36,24 @@ const getDefaultWebpackOptions = () => {
   }
 }
 
+interface PreprocessorOptions {
+  webpackOptions?: webpack.Configuration
+  watchOptions?: Object
+  additionalEntries?: string[]
+}
+
+interface FileEvent extends events.EventEmitter {
+  filePath: string
+  outputPath: string
+  shouldWatch: boolean
+}
+
 // export a function that returns another function, making it easy for users
 // to configure like so:
 //
 // on('file:preprocessor', webpack(options))
 //
-const preprocessor = (options = {}) => {
+function preprocessor (options:PreprocessorOptions = {}) {
   debug('user options:', options)
 
   // we return function that accepts the arguments provided by
@@ -52,7 +67,7 @@ const preprocessor = (options = {}) => {
   // when running in the GUI, it will likely get called multiple times
   // with the same filePath, as the user could re-run the tests, causing
   // the supported file and spec file to be requested again
-  return (file) => {
+  return (file: FileEvent) => {
     const filePath = file.filePath
 
     debug('get', filePath)
@@ -67,7 +82,7 @@ const preprocessor = (options = {}) => {
     }
 
     // user can override the default options
-    let webpackOptions = options.webpackOptions || getDefaultWebpackOptions()
+    let webpackOptions:webpack.Configuration = options.webpackOptions || getDefaultWebpackOptions()
     const watchOptions = options.watchOptions || {}
 
     debug('webpackOptions: %o', webpackOptions)
@@ -109,7 +124,8 @@ const preprocessor = (options = {}) => {
     // is invoked again with the same filePath
     bundles[filePath] = latestBundle.promise
 
-    const rejectWithErr = (err) => {
+    const rejectWithErr = (err: Error) => {
+      // @ts-ignore
       err.filePath = filePath
       debug(`errored bundling ${outputPath}`, err.message)
 
@@ -118,7 +134,7 @@ const preprocessor = (options = {}) => {
 
     // this function is called when bundling is finished, once at the start
     // and, if watching, each time watching triggers a re-bundle
-    const handle = (err, stats) => {
+    const handle = (err: Error, stats: webpack.Stats) => {
       if (err) {
         debug('handle - had error', err.message)
 
@@ -190,6 +206,9 @@ const preprocessor = (options = {}) => {
       debug('watching')
 
       if (compiler.hooks) {
+        // TODO compile.tap takes "string | Tap"
+        // so seems we just need to pass plugin.name
+        // @ts-ignore
         compiler.hooks.compile.tap(plugin, onCompile)
       } else {
         compiler.plugin('compile', onCompile)
@@ -205,7 +224,7 @@ const preprocessor = (options = {}) => {
       delete bundles[filePath]
 
       if (file.shouldWatch) {
-        bundler.close(cb)
+        (bundler as webpack.Compiler.Watching).close(cb)
       }
     })
 
@@ -233,8 +252,10 @@ preprocessor.__reset = () => {
   bundles = {}
 }
 
-function cleanseError (err) {
+function cleanseError (err: string) {
   return err.replace(/\n\s*at.*/g, '').replace(/From previous event:\n?/g, '')
 }
 
-module.exports = preprocessor
+// module.exports = preprocessor
+// export default preprocessor
+export = preprocessor
