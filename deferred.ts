@@ -1,15 +1,17 @@
 import * as Promise from 'bluebird'
 
-export function createDeferred () {
-  const deferred = {}
-
-  // @ts-ignore
-  deferred.promise = new Promise((resolve, reject) => {
-    // @ts-ignore
-    deferred.resolve = resolve
-    // @ts-ignore
-    deferred.reject = reject
+export function createDeferred<T> () {
+  let resolve: (thenableOrResult?: T | PromiseLike<T> | undefined) => void
+  let reject: any
+  const promise = new Promise<T>(function (_resolve, _reject) {
+    resolve = _resolve
+    reject = _reject
   })
 
-  return deferred
+  return {
+    //@ts-ignore
+    resolve,
+    reject,
+    promise,
+  }
 }

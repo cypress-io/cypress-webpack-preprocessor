@@ -141,7 +141,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
     // it's a deferred object that will be resolved or rejected in
     // the `handle` function below and its promise is what is ultimately
     // returned from this function
-    let latestBundle = createDeferred()
+    let latestBundle = createDeferred<string>()
 
     // cache the bundle promise, so it can be returned if this function
     // is invoked again with the same filePath
@@ -206,7 +206,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       debug('compile', filePath)
       // we overwrite the latest bundle, so that a new call to this function
       // returns a promise that resolves when the bundling is finished
-      latestBundle = createDeferred()
+      latestBundle = createDeferred<string>()
       bundles[filePath] = latestBundle.promise
 
       bundles[filePath].finally(() => {
