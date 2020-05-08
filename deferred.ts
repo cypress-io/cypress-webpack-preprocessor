@@ -14,4 +14,4 @@ const createDeferred = () => {
   return deferred
 }
 
-export default createDeferred
+export = createDeferred
