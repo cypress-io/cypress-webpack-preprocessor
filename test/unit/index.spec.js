@@ -175,6 +175,22 @@ describe('webpack preprocessor', function () {
         })
       })
 
+      describe('optimization', function () {
+        it('is undefined by default', function () {
+          return this.run().then(() => {
+            expect(webpack.lastCall.args[0].optimization).to.equal(undefined)
+          })
+        })
+
+        it('is removed from user webpack options', function () {
+          const options = { webpackOptions: { optimization: {} } }
+
+          return this.run(options).then(() => {
+            expect(webpack.lastCall.args[0].optimization).to.equal(undefined)
+          })
+        })
+      })
+
       it('runs when shouldWatch is false', function () {
         return this.run().then(() => {
           expect(this.compilerApi.run).to.be.called

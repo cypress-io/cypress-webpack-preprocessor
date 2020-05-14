@@ -158,6 +158,11 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       webpackOptions.mode = 'development'
     }
 
+    if ('optimization' in webpackOptions) {
+      debug('removing optimization property from webpack options')
+      delete webpackOptions.optimization
+    }
+
     debug(`input: ${filePath}`)
     debug(`output: ${outputPath}`)
 

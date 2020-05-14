@@ -97,6 +97,8 @@ Source maps are always enabled unless explicitly disabled by specifying `devtool
 
 Webpack [mode](https://webpack.js.org/configuration/mode/) is set to `development` if not present. You can set `mode` to "development", "production" or "none".
 
+If your webpack config includes [optimization](https://webpack.js.org/configuration/optimization/) property, it is removed before bundling spec files.
+
 ### use babelrc
 
 If you have a `.babelrc` file and would like to use it, then you must delete `options.presets` from the default Webpack options
