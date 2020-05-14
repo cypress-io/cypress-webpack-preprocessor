@@ -1,6 +1,5 @@
-/// <reference types="cypress" />
-describe('Use .babelrc', () => {
-  it('handles nullish operator', () => {
+describe('Use ts-loader', () => {
+  it('works', () => {
     const data = {
       person: {
         firstName: 'Joe',
