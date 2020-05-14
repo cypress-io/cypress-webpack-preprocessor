@@ -64,6 +64,8 @@ workflows:
           executor: cypress/base-12-14-0
           # we still need to install local TypeScript and Cypress
           install-command: npm install
+          # not really a build command, just TS check
+          build: npm run types
           timeout: '1m'
           no-workspace: true
           working_directory: examples/use-ts-loader

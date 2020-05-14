@@ -6,7 +6,7 @@
   "scripts": {
     "cy:open": "cypress open",
     "test": "cypress run",
-    "types": "tsc --noEmit cypress/integration/*.ts"
+    "types": "tsc --noEmit --lib es2015,dom --types cypress cypress/integration/*.ts"
   },
   "devDependencies": {
     "cypress": "4.5.0",
