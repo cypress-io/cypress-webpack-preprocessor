@@ -75,6 +75,7 @@ Object of webpack options. Just `require` in the options from your `webpack.conf
 
 ```javascript
 {
+  mode: 'development',
   module: {
     rules: [
       {
@@ -92,7 +93,7 @@ Object of webpack options. Just `require` in the options from your `webpack.conf
 }
 ```
 
-Source maps are always enabled unless explicitly disabled by specifying `devtool: false`.
+Source maps are always enabled unless explicitly disabled by specifying `devtool: false`. Webpack [mode](https://webpack.js.org/configuration/mode/) is set to `development` if not present.
 
 ### use babelrc
 
