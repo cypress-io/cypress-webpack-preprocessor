@@ -8,6 +8,9 @@
     "test": "../../node_modules/.bin/cypress run",
     "types": "../../node_modules/.bin/tsc --noEmit cypress/integration/*.ts"
   },
+  "devDependencies": {
+    "cypress": "4.5.0"
+  },
   "license": "ISC",
   "author": "",
   "keywords": []
