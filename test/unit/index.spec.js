@@ -143,17 +143,35 @@ describe('webpack preprocessor', function () {
         })
       })
 
-      it('enables inline source maps', function () {
-        return this.run().then(() => {
-          expect(webpack.lastCall.args[0].devtool).to.equal('inline-source-map')
+      describe('devtool', function () {
+        it('enables inline source maps', function () {
+          return this.run().then(() => {
+            expect(webpack.lastCall.args[0].devtool).to.equal('inline-source-map')
+          })
+        })
+
+        it('does not enable inline source maps when devtool is false', function () {
+          const options = { webpackOptions: { devtool: false } }
+
+          return this.run(options).then(() => {
+            expect(webpack.lastCall.args[0].devtool).to.be.false
+          })
         })
       })
 
-      it('does not enable inline source maps when devtool is false', function () {
-        const options = { webpackOptions: { devtool: false } }
+      describe('mode', function () {
+        it('sets mode to development by default', function () {
+          return this.run().then(() => {
+            expect(webpack.lastCall.args[0].mode).to.equal('development')
+          })
+        })
 
-        return this.run(options).then(() => {
-          expect(webpack.lastCall.args[0].devtool).to.be.false
+        it('follows user mode if present', function () {
+          const options = { webpackOptions: { mode: 'production' } }
+
+          return this.run(options).then(() => {
+            expect(webpack.lastCall.args[0].mode).to.equal('production')
+          })
         })
       })
 

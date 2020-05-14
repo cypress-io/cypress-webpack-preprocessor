@@ -21,6 +21,7 @@ const getDefaultWebpackOptions = (): webpack.Configuration => {
   debug('load default options')
 
   return {
+    mode: 'development',
     module: {
       rules: [
         {
@@ -149,6 +150,10 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
 
     if (webpackOptions.devtool !== false) {
       webpackOptions.devtool = 'inline-source-map'
+    }
+
+    if (!('mode' in webpackOptions)) {
+      webpackOptions.mode = 'development'
     }
 
     debug(`input: ${filePath}`)
