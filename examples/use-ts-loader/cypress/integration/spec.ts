@@ -6,8 +6,7 @@ describe('Use .babelrc', () => {
         firstName: 'Joe',
       },
     }
-    const name = data.person.firstName ?? 'Anonymous'
 
-    expect(name).to.equal('Joe')
+    expect(data.person.firstName).to.equal('Joe')
   })
 })
