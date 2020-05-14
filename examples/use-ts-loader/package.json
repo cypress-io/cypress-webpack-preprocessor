@@ -4,12 +4,14 @@
   "description": "Transpiling specs using local .babelrc file",
   "private": true,
   "scripts": {
-    "cy:open": "../../node_modules/.bin/cypress open",
-    "test": "../../node_modules/.bin/cypress run",
-    "types": "../../node_modules/.bin/tsc --noEmit cypress/integration/*.ts"
+    "cy:open": "cypress open",
+    "test": "cypress run",
+    "types": "tsc --noEmit cypress/integration/*.ts"
   },
   "devDependencies": {
-    "cypress": "4.5.0"
+    "cypress": "4.5.0",
+    "ts-loader": "7.0.4",
+    "typescript": "3.9.2"
   },
   "license": "ISC",
   "author": "",
