@@ -149,10 +149,12 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
     })
 
     if (webpackOptions.devtool !== false) {
+      debug('setting devtool to inline-source-map')
       webpackOptions.devtool = 'inline-source-map'
     }
 
     if (!('mode' in webpackOptions)) {
+      debug('setting webpack mode to development')
       webpackOptions.mode = 'development'
     }
 
