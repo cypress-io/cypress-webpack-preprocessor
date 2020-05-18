@@ -107,7 +107,9 @@ describe('webpack preprocessor', function () {
 
       it('specifies the entry file', function () {
         return this.run().then(() => {
-          expect(webpack.lastCall.args[0].entry).to.eql([this.file.filePath])
+          expect(webpack).to.be.calledWithMatch({
+            entry: [this.file.filePath],
+          })
         })
       })
 
@@ -115,19 +117,23 @@ describe('webpack preprocessor', function () {
         return this.run({
           additionalEntries: ['entry-1.js', 'entry-2.js'],
         }).then(() => {
-          expect(webpack.lastCall.args[0].entry).to.eql([
-            this.file.filePath,
-            'entry-1.js',
-            'entry-2.js',
-          ])
+          expect(webpack).to.be.calledWithMatch({
+            entry: [
+              this.file.filePath,
+              'entry-1.js',
+              'entry-2.js',
+            ],
+          })
         })
       })
 
       it('specifies output path and filename', function () {
         return this.run().then(() => {
-          expect(webpack.lastCall.args[0].output).to.eql({
-            path: 'output',
-            filename: 'output.js',
+          expect(webpack).to.be.calledWithMatch({
+            output: {
+              path: 'output',
+              filename: 'output.js',
+            },
           })
         })
       })
@@ -146,7 +152,9 @@ describe('webpack preprocessor', function () {
       describe('devtool', function () {
         it('enables inline source maps', function () {
           return this.run().then(() => {
-            expect(webpack.lastCall.args[0].devtool).to.equal('inline-source-map')
+            expect(webpack).to.be.calledWithMatch({
+              devtool: 'inline-source-map',
+            })
           })
         })
 
@@ -154,7 +162,11 @@ describe('webpack preprocessor', function () {
           const options = { webpackOptions: { devtool: false } }
 
           return this.run(options).then(() => {
-            expect(webpack.lastCall.args[0].devtool).to.be.false
+            expect(webpack).to.be.calledWithMatch({
+              devtool: false,
+            })
+          })
+        })
           })
         })
       })
@@ -162,7 +174,9 @@ describe('webpack preprocessor', function () {
       describe('mode', function () {
         it('sets mode to development by default', function () {
           return this.run().then(() => {
-            expect(webpack.lastCall.args[0].mode).to.equal('development')
+            expect(webpack).to.be.calledWithMatch({
+              mode: 'development',
+            })
           })
         })
 
@@ -196,7 +210,7 @@ describe('webpack preprocessor', function () {
         const options = { watchOptions: { poll: true } }
 
         return this.run(options).then(() => {
-          expect(this.compilerApi.watch.lastCall.args[0]).to.eql({
+          expect(this.compilerApi.watch).to.be.calledWith({
             poll: true,
           })
         })
@@ -270,9 +284,9 @@ describe('webpack preprocessor', function () {
         const options = { webpackOptions: { module: { rules: [] } } }
 
         return this.run(options).then(() => {
-          expect(webpack.lastCall.args[0].module).to.equal(options.webpackOptions.module)
-        })
-      })
+          expect(webpack).to.be.calledWithMatch({
+            module: options.webpackOptions.module,
+          })
         })
       })
     })
