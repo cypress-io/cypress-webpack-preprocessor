@@ -1,3 +1,5 @@
+const debug = require('debug')('cypress:webpack')
+
 let sourceMapOverride: null | boolean = null
 
 export const tryRequireTypescript = () => {
@@ -7,11 +9,15 @@ export const tryRequireTypescript = () => {
 
     const typescript = require('typescript')
 
+    debug('typescript found, overriding typescript.createProgram()')
+
     const { createProgram } = typescript
 
     typescript.createProgram = (...args: [any]) => {
       const [programOptions] = args
       const { options } = programOptions
+
+      debug('typescript unmodified createProgram options %o', options)
 
       // if sourceMap has been set then apply
       // these overrides to force typescript
@@ -21,6 +27,8 @@ export const tryRequireTypescript = () => {
 
         delete options.inlineSources
         delete options.inlineSourceMap
+
+        debug('typescript modified createProgram options %o', options)
       }
 
       return createProgram.apply(typescript, args)
@@ -28,6 +36,8 @@ export const tryRequireTypescript = () => {
 
     return typescript
   } catch (err) {
+    debug('typescript not found')
+
     // for testing
     return err
   }

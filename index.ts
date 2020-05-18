@@ -1,6 +1,4 @@
-import { tryRequireTypescript, overrideSourceMaps } from './lib/typescript-overrides'
-
-tryRequireTypescript()
+import { overrideSourceMaps } from './lib/typescript-overrides'
 
 import * as Promise from 'bluebird'
 import * as events from 'events'
@@ -99,7 +97,7 @@ interface WebpackPreprocessor extends WebpackPreprocessorFn {
  */
 // @ts-ignore
 const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): FilePreprocessor => {
-  debug('user options:', options)
+  debug('user options: %o', options)
 
   // we return function that accepts the arguments provided by
   // the event 'file:preprocessor'
