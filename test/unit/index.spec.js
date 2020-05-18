@@ -273,23 +273,6 @@ describe('webpack preprocessor', function () {
           expect(webpack.lastCall.args[0].module).to.equal(options.webpackOptions.module)
         })
       })
-
-      it('requires babel dependencies when default options are used', function () {
-        sinon.spy(stubbableRequire, 'resolve')
-
-        return this.run().then(() => {
-          expect(stubbableRequire.resolve).to.be.calledWith('babel-loader')
-          expect(stubbableRequire.resolve).to.be.calledWith('@babel/preset-env')
-        })
-      })
-
-      it('does not requires babel dependencies when user options are non-default', function () {
-        sinon.spy(stubbableRequire, 'resolve')
-        const options = { webpackOptions: { module: { rules: [] } } }
-
-        return this.run(options).then(() => {
-          expect(stubbableRequire.resolve).not.to.be.calledWith('babel-loader')
-          expect(stubbableRequire.resolve).not.to.be.calledWith('@babel/preset-env')
         })
       })
     })

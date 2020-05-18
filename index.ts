@@ -8,8 +8,6 @@ const path = require('path')
 const debug = require('debug')('cypress:webpack')
 const debugStats = require('debug')('cypress:webpack:stats')
 
-const stubbableRequire = require('./stubbable-require')
-
 type FilePath = string
 
 // bundle promises from input spec filename to output bundled file paths
@@ -29,9 +27,9 @@ const getDefaultWebpackOptions = (): webpack.Configuration => {
           exclude: [/node_modules/],
           use: [
             {
-              loader: stubbableRequire.resolve('babel-loader'),
+              loader: 'babel-loader',
               options: {
-                presets: [stubbableRequire.resolve('@babel/preset-env')],
+                presets: ['@babel/preset-env'],
               },
             },
           ],
