@@ -16,7 +16,7 @@ mockery.enable({
 
 mockery.registerMock('webpack', webpack)
 
-const preprocessor = require('../../dist/index')
+const preprocessor = require('../../index')
 
 describe('webpack preprocessor', function () {
   beforeEach(function () {
