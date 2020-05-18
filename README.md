@@ -175,6 +175,18 @@ DEBUG=cypress:webpack:stats
 
 Use the [version of Node that matches Cypress](https://github.com/cypress-io/cypress/blob/develop/.node-version).
 
+Build the typescript files:
+
+```shell
+yarn build
+```
+
+Watch the typescript files and rebuild on file change:
+
+```shell
+yarn build --watch
+```
+
 Run all tests once:
 
 ```shell
