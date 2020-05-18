@@ -1,7 +1,7 @@
-import * as webpack from 'webpack'
 import * as Promise from 'bluebird'
 import * as events from 'events'
-
+import * as _ from 'lodash'
+import * as webpack from 'webpack'
 import { createDeferred } from './deferred'
 
 const path = require('path')
@@ -122,14 +122,8 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       return bundles[filePath]
     }
 
-    // user can override the default options
-    let webpackOptions: webpack.Configuration = options.webpackOptions || getDefaultWebpackOptions()
-    const watchOptions = options.watchOptions || {}
+    const defaultWebpackOptions = getDefaultWebpackOptions()
 
-    debug('webpackOptions: %o', webpackOptions)
-    debug('watchOptions: %o', watchOptions)
-
-    const entry = [filePath].concat(options.additionalEntries || [])
     // we're provided a default output path that lives alongside Cypress's
     // app data files so we don't have to worry about where to put the bundled
     // file on disk
@@ -137,25 +131,36 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       ? file.outputPath
       : `${file.outputPath}.js`
 
-    // we need to set entry and output
-    webpackOptions = Object.assign(webpackOptions, {
+    const entry = [filePath].concat(options.additionalEntries || [])
+
+    const watchOptions = options.watchOptions || {}
+
+    // user can override the default options
+    const webpackOptions: webpack.Configuration = _
+    .chain(options.webpackOptions)
+    .defaultTo(defaultWebpackOptions)
+    .defaults({
+      mode: defaultWebpackOptions.mode,
+    })
+    .assign({
+      // we need to set entry and output
       entry,
       output: {
         path: path.dirname(outputPath),
         filename: path.basename(outputPath),
       },
     })
+    .tap((opts) => {
+      if (opts.devtool !== false) {
+        debug('setting devtool to inline-source-map')
 
-    if (webpackOptions.devtool !== false) {
-      debug('setting devtool to inline-source-map')
-      webpackOptions.devtool = 'inline-source-map'
-    }
+        opts.devtool = 'inline-source-map'
+      }
+    })
+    .value() as any
 
-    if (!('mode' in webpackOptions)) {
-      debug('setting webpack mode to development')
-      webpackOptions.mode = 'development'
-    }
-
+    debug('webpackOptions: %o', webpackOptions)
+    debug('watchOptions: %o', watchOptions)
     debug(`input: ${filePath}`)
     debug(`output: ${outputPath}`)
 
@@ -282,8 +287,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
   }
 }
 
-// provide a clone of the default options, lazy-loading them
-// so they aren't required unless the user utilizes them
+// provide a clone of the default options
 Object.defineProperty(preprocessor, 'defaultOptions', {
   get () {
     debug('get default options')

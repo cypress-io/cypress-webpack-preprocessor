@@ -167,6 +167,14 @@ describe('webpack preprocessor', function () {
             })
           })
         })
+
+        it('always sets devtool even when mode is "production"', function () {
+          const options = { webpackOptions: { mode: 'production' } }
+
+          return this.run(options).then(() => {
+            expect(webpack).to.be.calledWithMatch({
+              devtool: 'inline-source-map',
+            })
           })
         })
       })
@@ -184,7 +192,9 @@ describe('webpack preprocessor', function () {
           const options = { webpackOptions: { mode: 'production' } }
 
           return this.run(options).then(() => {
-            expect(webpack.lastCall.args[0].mode).to.equal('production')
+            expect(webpack).to.be.calledWithMatch({
+              mode: 'production',
+            })
           })
         })
       })
