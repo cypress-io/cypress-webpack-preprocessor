@@ -6,7 +6,7 @@
   "main": "dist",
   "scripts": {
     "ban": "ban",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "deps": "deps-ok && dependency-check --no-dev .",
     "license": "license-checker --production --onlyunknown --csv",
     "lint": "eslint --ext .js,.jsx,.json,.ts,.tsx .",
