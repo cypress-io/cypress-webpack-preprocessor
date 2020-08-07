@@ -41,6 +41,27 @@ const getDefaultWebpackOptions = (): webpack.Configuration => {
   }
 }
 
+const quietErrorMessage = (err: Error) => {
+  if (!err || !err.message) return err
+
+  const message = err.message
+
+  if (!message.includes('Module not found')) return err
+
+  const startIndex = message.lastIndexOf('resolve ')
+  const endIndex = message.lastIndexOf(`doesn't exist`) + `doesn't exist`.length
+  const partToReplace = message.substring(startIndex, endIndex)
+  const newMessagePart = `Looked for and couldn't find the file at the following paths:`
+
+  err.message = err.message.replace(partToReplace, newMessagePart)
+
+  if (err.stack) {
+    err.stack = err.stack.replace(partToReplace, newMessagePart)
+  }
+
+  return err
+}
+
 /**
  * Configuration object for this Webpack preprocessor
  */
@@ -189,8 +210,11 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
     bundles[filePath] = latestBundle.promise
 
     const rejectWithErr = (err: Error) => {
+      err = quietErrorMessage(err)
+
       // @ts-ignore
       err.filePath = filePath
+
       debug(`errored bundling ${outputPath}`, err.message)
 
       latestBundle.reject(err)

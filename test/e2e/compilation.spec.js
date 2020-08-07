@@ -22,7 +22,7 @@ describe('webpack preprocessor - e2e', () => {
   beforeEach(async () => {
     preprocessor.__reset()
 
-    run = ({ options, keepFile, shouldWatch = false, fileName = 'example_spec.js' }) => {
+    run = ({ options, keepFile, shouldWatch = false, fileName = 'example_spec.js' } = {}) => {
       if (!keepFile) {
         file = Object.assign(new EventEmitter(), {
           filePath: path.join(outputDir, fileName),
@@ -53,6 +53,18 @@ describe('webpack preprocessor - e2e', () => {
 
     return run({ options }).then((outputPath) => {
       snapshot(fs.readFileSync(outputPath).toString())
+    })
+  })
+
+  it('has less verbose "Module not found"error', () => {
+    return run({ fileName: 'imports_nonexistent_file_spec.js' })
+    .then(() => {
+      throw new Error('Should not resolve')
+    })
+    .catch((err) => {
+      const normalizedMessage = err.message.replace(/\/\S+\/_test/g, '<path>/_test')
+
+      snapshot(normalizedMessage)
     })
   })
 
