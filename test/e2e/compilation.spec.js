@@ -12,6 +12,10 @@ const { expect } = chai
 
 const preprocessor = require('../../dist/index')
 
+const normalizeErrMessage = (message) => {
+  return message.replace(/\/\S+\/_test/g, '<path>/_test')
+}
+
 const fixturesDir = path.join(__dirname, '..', 'fixtures')
 const outputDir = path.join(__dirname, '..', '_test-output')
 
@@ -56,15 +60,23 @@ describe('webpack preprocessor - e2e', () => {
     })
   })
 
-  it('has less verbose "Module not found"error', () => {
+  it('has less verbose "Module not found" error', () => {
     return run({ fileName: 'imports_nonexistent_file_spec.js' })
     .then(() => {
       throw new Error('Should not resolve')
     })
     .catch((err) => {
-      const normalizedMessage = err.message.replace(/\/\S+\/_test/g, '<path>/_test')
+      snapshot(normalizeErrMessage(err.message))
+    })
+  })
 
-      snapshot(normalizedMessage)
+  it('has less verbose syntax error', () => {
+    return run({ fileName: 'syntax_error_spec.js' })
+    .then(() => {
+      throw new Error('Should not resolve')
+    })
+    .catch((err) => {
+      snapshot(normalizeErrMessage(err.message))
     })
   })
 

@@ -41,9 +41,17 @@ const getDefaultWebpackOptions = (): webpack.Configuration => {
   }
 }
 
-const quietErrorMessage = (err: Error) => {
-  if (!err || !err.message) return err
+const replaceErrMessage = (err: Error, partToReplace: string, replaceWith = '') => {
+  err.message = _.trim(err.message.replace(partToReplace, replaceWith))
 
+  if (err.stack) {
+    err.stack = _.trim(err.stack.replace(partToReplace, replaceWith))
+  }
+
+  return err
+}
+
+const cleanModuleNotFoundError = (err: Error) => {
   const message = err.message
 
   if (!message.includes('Module not found')) return err
@@ -53,11 +61,25 @@ const quietErrorMessage = (err: Error) => {
   const partToReplace = message.substring(startIndex, endIndex)
   const newMessagePart = `Looked for and couldn't find the file at the following paths:`
 
-  err.message = err.message.replace(partToReplace, newMessagePart)
+  return replaceErrMessage(err, partToReplace, newMessagePart)
+}
 
-  if (err.stack) {
-    err.stack = err.stack.replace(partToReplace, newMessagePart)
-  }
+const cleanMultiNonsense = (err: Error) => {
+  const message = err.message
+  const startIndex = message.indexOf('@ multi')
+
+  if (startIndex < 0) return err
+
+  const partToReplace = message.substring(startIndex)
+
+  return replaceErrMessage(err, partToReplace)
+}
+
+const quietErrorMessage = (err: Error) => {
+  if (!err || !err.message) return err
+
+  err = cleanModuleNotFoundError(err)
+  err = cleanMultiNonsense(err)
 
   return err
 }
