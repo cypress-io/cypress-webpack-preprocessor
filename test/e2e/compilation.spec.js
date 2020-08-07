@@ -12,26 +12,30 @@ const { expect } = chai
 
 const preprocessor = require('../../dist/index')
 
-describe('webpack preprocessor - e2e', () => {
-  const outputPath = path.join(__dirname, '..', '_test-output', 'output.js')
+const fixturesDir = path.join(__dirname, '..', 'fixtures')
+const outputDir = path.join(__dirname, '..', '_test-output')
 
+describe('webpack preprocessor - e2e', () => {
+  let run
   let file
-  let filePath
 
   beforeEach(async () => {
-    const originalFilePath = path.join(__dirname, '..', 'fixtures', 'example_spec.js')
-
-    filePath = path.join(__dirname, '..', '_test-output', 'example_spec.js')
-
     preprocessor.__reset()
-    await fs.remove(path.join(__dirname, '_test-output'))
-    await fs.outputFile(filePath, '')
-    await fs.copyFile(originalFilePath, filePath)
 
-    file = Object.assign(new EventEmitter(), {
-      filePath,
-      outputPath,
-    })
+    run = ({ options, keepFile, shouldWatch = false, fileName = 'example_spec.js' }) => {
+      if (!keepFile) {
+        file = Object.assign(new EventEmitter(), {
+          filePath: path.join(outputDir, fileName),
+          outputPath: path.join(outputDir, fileName.replace('.', '_output.')),
+          shouldWatch,
+        })
+      }
+
+      return preprocessor(options)(file)
+    }
+
+    await fs.remove(outputDir)
+    await fs.copy(fixturesDir, outputDir)
   })
 
   afterEach(async () => {
@@ -45,10 +49,9 @@ describe('webpack preprocessor - e2e', () => {
   it('correctly preprocesses the file', () => {
     const options = preprocessor.defaultOptions
 
-    // our snapshot is minified
-    options.webpackOptions.mode = 'production'
+    options.webpackOptions.mode = 'production' // snapshot will be minified
 
-    return preprocessor(options)(file).then(() => {
+    return run({ options }).then((outputPath) => {
       snapshot(fs.readFileSync(outputPath).toString())
     })
   })
@@ -60,14 +63,12 @@ describe('webpack preprocessor - e2e', () => {
       throw new Error('Should not have trigger unhandled rejection')
     })
 
-    file.shouldWatch = true
-
-    await preprocessor()(file)
-    await fs.outputFile(filePath, '{')
+    await run({ shouldWatch: true })
+    await fs.outputFile(file.filePath, '{')
 
     await new Promise((resolve) => {
       setTimeout(() => {
-        preprocessor()(file)
+        run({ keepFile: true, shouldWatch: true })
         .catch((err) => {
           expect(err.stack).to.include('Unexpected token')
           resolve()
@@ -77,15 +78,11 @@ describe('webpack preprocessor - e2e', () => {
   })
 
   it('triggers rerun on syntax error', async () => {
+    await run({ shouldWatch: true })
+
     const _emit = sinon.spy(file, 'emit')
 
-    file.shouldWatch = true
-
-    await preprocessor()(file)
-
-    _emit.resetHistory()
-
-    await fs.outputFile(filePath, '{')
+    await fs.outputFile(file.filePath, '{')
 
     await retry(() => expect(_emit).calledWith('rerun'))
   })
