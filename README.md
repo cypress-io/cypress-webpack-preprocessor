@@ -2,7 +2,7 @@
 
 Cypress preprocessor for bundling JavaScript via webpack
 
-# :warning: THIS REPO HAS BEEN ARCHIVED :warning:
+# :warning: THIS REPO HAS BEEN MOVED :warning:
 
 ### `@cypress/webpack-preprocessor` now lives in the main Cypress monorepo: [cypress-io/cypress](https://github.com/cypress-io/cypress)
 
